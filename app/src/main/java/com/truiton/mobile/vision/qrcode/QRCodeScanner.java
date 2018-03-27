@@ -13,16 +13,14 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.widget.Toast;
+
 import com.google.zxing.BarcodeFormat;
-import com.journeyapps.barcodescanner.CaptureActivity;
 import java.io.IOException;
 import java.util.Collection;
 
 
 public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Callback {
-
-
-    private static final String TAG = CaptureActivity.class.getSimpleName();// 打印标识
 
     private static final float BEEP_VOLUME = 0.10f;
 
@@ -71,10 +69,8 @@ public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Ca
         setContentView(R.layout.activity_scanner2);
 
         hasSurface = false;
+        mViewfinderView = findViewById(R.id.viewfinder_view);
 
-        setmViewfinderView((ViewfinderView) findViewById(R.id.viewfinder_view));
-
-        setListener();
 
         findViewById(R.id.scan_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -83,20 +79,6 @@ public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Ca
             }
         });
 
-    }
-
-    public void setmViewfinderView(ViewfinderView mViewfinderView) {
-        this.mViewfinderView = mViewfinderView;
-    }
-
-
-    private void setListener() {
-        openPromptWindow(findViewById(R.id.flt_layout));
-
-
-    }
-
-    private void openPromptWindow(View parent) {
     }
 
     @Override
@@ -124,19 +106,37 @@ public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Ca
             surfaceHolder.addCallback(this);
             surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
         }
+    }
 
 
+    @Override
+    public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-
+        if (!hasSurface) {
+            hasSurface = true;
+            if (mHasShow && !mScanNow) {
+                initCamera();
+            }
+        }
 
     }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
+
+        hasSurface = false;
+    }
+
 
     private void initCamera() {
         try {
 
-
             initBeepSound();
-
 
             mVibrate = true;
 
@@ -148,10 +148,10 @@ public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Ca
             if (handler == null) {
                 handler = new CaptureActivityHandler(this, decodeFormats, characterSet, cameraManager);
             }
-            // decodeOrStoreSavedBitmap(null, null);
+
         } catch (IOException ioe) {
 
-            //  displayFrameworkBugMessageAndExit();
+
         } catch (RuntimeException e) {
             // Barcode Scanner has seen crashes in the wild of this variety:
             // java.?lang.?RuntimeException: Fail to connect to camera service
@@ -204,52 +204,18 @@ public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Ca
         if(resultString !=null && !resultString.equals("")){
             returnScanResultToKony(resultString);
         }
-     //   Intent intent = new Intent(QRCodeScanner.this, MainActivity.class);
-    //    intent.putExtra("resultString", resultString);
-    //    QRCodeScanner.this.startActivity(intent);
 
-
-
-        // isValidate(resultString);
     }
 
     public String returnScanResultToKony(String resultString){
 
+
+        Toast.makeText(QRCodeScanner.this,""+resultString,Toast.LENGTH_LONG).show();
         return resultString;
 
 
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder surfaceHolder) {
-
-        if (surfaceHolder == null) {
-          //  LogUtil.errorLog(TAG, "*** WARNING *** surfaceCreated() gave us a null surface!");
-        }
-        if (!hasSurface) {
-            hasSurface = true;
-            if (mHasShow && !mScanNow) {
-                initCamera();
-            }
-        }
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-
-        hasSurface = false;
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
 
     private void playBeepSoundAndVibrate() {
         if (mPlayBeep && mMediaPlayer != null) {
@@ -260,11 +226,5 @@ public class QRCodeScanner extends AppCompatActivity implements SurfaceHolder.Ca
             vibrator.vibrate(VIBRATE_DURATION);
         }
     }
-
-//    private void reScan() {
-//        onPause();
-//        onResume();
-//    }
-
 
 }

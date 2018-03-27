@@ -1,18 +1,3 @@
-/*
- * Copyright (C) 2008 ZXing authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 package com.truiton.mobile.vision.qrcode;
 
@@ -20,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.DecodeHintType;
@@ -32,11 +18,7 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-/**
- * This thread does all the heavy lifting of decoding the images.
- *
- * @author dswitkin@google.com (Daniel Switkin)
- */
+
 final class DecodeThread extends Thread {
 
   public static final String BARCODE_BITMAP = "barcode_bitmap";
@@ -48,8 +30,8 @@ final class DecodeThread extends Thread {
 
   DecodeThread(QRCodeScanner activity,
                Collection<BarcodeFormat> decodeFormats,
-               String characterSet,
-               ResultPointCallback resultPointCallback) {
+               String characterSet
+               ) {
 
     this.activity = activity;
     handlerInitLatch = new CountDownLatch(1);
@@ -75,7 +57,8 @@ final class DecodeThread extends Thread {
     if (characterSet != null) {
       hints.put(DecodeHintType.CHARACTER_SET, characterSet);
     }
-    hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
+    Log.i("sud","decodeFormats"+decodeFormats.size());
+//    hints.put(DecodeHintType.NEED_RESULT_POINT_CALLBACK, resultPointCallback);
   }
 
   Handler getHandler() {
